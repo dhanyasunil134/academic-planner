@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow Desk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Poppins:wght@600&family=Pacifico&family=Lato&family=Shadows+Into+Light&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Patrick Hand', cursive;
+      background: url('https://marketplace.canva.com/EAGIenJ__Xk/2/0/1131w/canva-brown-watercolor-floral-aesthetic-background-document-a4-20Wu25IS9UM.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow-x: hidden;
+      color: #000;
+    }
+
+    .page {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transform: translateY(100px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      z-index: 0;
+      pointer-events: none;
+      padding: 20px;
+      height: 100vh;
+    }
+
+    .page.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+      z-index: 1;
+    }
+
+    .home-wall {
+      background: transparent;
+      text-align: center;
+      padding: 50px 20px;
+      margin: 80px auto 60px;
+      width: 80%;
+    }
+
+    #welcomeTitle {
+      font-family: 'Shadows Into Light', cursive;
+      font-size: 3em;
+      color: #4B2E2E;
+    }
+
+    #quote {
+      font-family: 'Lato', sans-serif;
+      font-size: 1.5em;
+      color: #000;
+    }
+
+    .desk, .wall {
+      background: rgba(255, 255, 255, 0.6);
+      margin: 50px auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 1000px;
+      border-radius: 15px;
+      color: #000;
+      position: relative;
+    }
+
+    .sticky {
+      background-color: transparent;
+      padding: 15px;
+      border: 1px solid #000;
+      margin: 10px;
+      border-radius: 10px;
+    }
+
+    .page-button {
+      position: fixed;
+      bottom: 20px;
+      background: linear-gradient(90deg, #72c6ef, #004e92);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 35px;
+      border: none;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
+
+    .page-button:hover {
+      transform: scale(1.08);
+      background: linear-gradient(90deg, #89f7fe, #66a6ff);
+    }
+
+    .page-button.back { left: 20px; }
+    .page-button.forward { right: 20px; }
+
+    .bubble-btn {
+      background: #8fbf87;
+      border: none;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .bubble-btn:hover {
+      transform: scale(1.08);
+      background-color: #a5d6a7;
+    }
+
+    input, textarea {
+      width: 90%;
+      padding: 5px;
+      margin-top: 5px;
+      font-size: 1em;
+      color: #000;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .timer {
+      font-size: 2em;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    table, th, td {
+      border: 1px solid #000;
+      border-collapse: collapse;
+      padding: 5px;
+      text-align: center;
+      color: #000;
+    }
+
+    .calendar td:hover {
+      background-color: #cce5cc;
+      cursor: pointer;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .slider-container span {
+      margin-right: 8px;
+      font-size: 1.2em;
+    }
+
+    .slider-container input[type="range"] {
+      flex-grow: 1;
+    }
+
+    .calc-output {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Welcome Page -->
+  <div id="homePage" class="page active">
+    <div class="home-wall" id="welcomeBox">
+      <h1 id="welcomeTitle">Welcome to Dhanya's Study Planner</h1>
+      <p id="quote">"Loading quote..."</p>
+      <button class="page-button forward" onclick="goToPage('subjectsPage')">Start Planning →</button>
+    </div>
+  </div>
+
+  <!-- Subjects Page -->
+  <div id="subjectsPage" class="page">
+    <div class="desk">
+      <div class="sticky">
+        <h3>📘 Subjects & Portions</h3>
+        <div id="subjectList"></div>
+        <input type="text" id="subjectName" placeholder="Subject">
+        <input type="number" id="subjectMarks" placeholder="Marks">
+        <button class="bubble-btn" onclick="addSubject()">Add</button>
+      </div>
+    </div>
+    <button class="page-button back" onclick="goToPage('homePage')">← Back</button>
+    <button class="page-button forward" onclick="goToPage('todoPage')">→ To-Do</button>
+  </div>
+
+  <!-- To-Do Page -->
+  <div id="todoPage" class="page">
+    <div class="desk">
+      <div class="sticky">
+        <h3>📝 To-Do List</h3>
+        <ul id="todoList"></ul>
+        <input type="text" id="taskInput" placeholder="New task">
+        <button class="bubble-btn" onclick="addTask()">Add</button>
+      </div>
+    </div>
+    <button class="page-button back" onclick="goToPage('subjectsPage')">← Back</button>
+    <button class="page-button forward" onclick="goToPage('calendarPage')">→ Calendar</button>
+  </div>
+
+  <!-- Calendar Page -->
+  <div id="calendarPage" class="page">
+    <div class="wall">
+      <h2>🗓️ Wall Calendar <span id="monthYearLabel"></span></h2>
+      <div style="text-align:center; margin-bottom:10px;">
+        <button class="bubble-btn" onclick="prevMonth()">← Previous</button>
+        <button class="bubble-btn" onclick="nextMonth()">Next →</button>
+      </div>
+      <table class="calendar" id="calendarTable"></table>
+      <input type="text" id="eventInput" placeholder="Add event">
+      <button class="bubble-btn" onclick="saveEvent()">Save Event</button>
+      <div id="eventView" style="padding:10px;margin-top:10px;"></div>
+    </div>
+    <button class="page-button back" onclick="goToPage('todoPage')">← Back</button>
+    <button class="page-button forward" onclick="goToPage('timerPage')">→ Timer</button>
+  </div>
+
+  <!-- Timer Page -->
+  <div id="timerPage" class="page">
+    <div class="desk">
+      <div class="sticky">
+        <h3>⌛ Study Timer</h3>
+        <div class="timer" id="timerDisplay">25:00</div>
+        <input type="number" id="minutes" value="25" min="1" max="90"> mins<br>
+        <button class="bubble-btn" onclick="startTimer()">Start</button>
+        <button class="bubble-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+    <button class="page-button back" onclick="goToPage('calendarPage')">← Back</button>
+    <button class="page-button forward" onclick="goToPage('notePage')">→ Notes</button>
+  </div>
+
+  <!-- Notes & Calculator Page -->
+  <div id="notePage" class="page">
+    <div class="desk">
+      <div class="sticky">
+        <h3>🗒️ Notes</h3>
+        <textarea placeholder="Write your notes here..."></textarea>
+
+        <h3 style="margin-top:20px;">🧮 Calculator</h3>
+        <input type="text" id="calcInput" placeholder="e.g. 2+2">
+        <button class="bubble-btn" onclick="calculate()">=</button>
+        <div id="calcResult" class="calc-output"></div>
+      </div>
+    </div>
+    <button class="page-button back" onclick="goToPage('timerPage')">← Back</button>
+    <button class="page-button forward" onclick="goToPage('homePage')">← Home</button>
+  </div>
+
+  <script>
+    function goToPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    const quotes = [
+      "Stay focused and never give up!",
+      "Small progress is still progress.",
+      "You are capable of amazing things.",
+      "Push yourself, no one else will do it for you.",
+      "Great things never come from comfort zones."
+    ];
+    let q = 0, char = 0;
+    const quoteElement = document.getElementById('quote');
+    function typeQuote() {
+      const quote = `"${quotes[q]}"`;
+      if (char < quote.length) {
+        quoteElement.textContent += quote.charAt(char++);
+        setTimeout(typeQuote, 40);
+      } else {
+        setTimeout(() => {
+          quoteElement.textContent = '';
+          char = 0;
+          q = (q + 1) % quotes.length;
+          typeQuote();
+        }, 3000);
+      }
+    }
+    typeQuote();
+
+    function addSubject() {
+      const name = document.getElementById('subjectName').value;
+      const marks = document.getElementById('subjectMarks').value;
+      if (!name || !marks) return;
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <b>${name}:</b> <input type='number' value='${marks}'> marks
+        <div class='slider-container'>
+          <span>🧠</span>
+          <input type='range' min='0' max='100' value='0'>
+          <span>%</span>
+        </div>
+        <button onclick='this.parentElement.remove()'>❌</button>
+      `;
+      document.getElementById('subjectList').appendChild(div);
+    }
+
+    function addTask() {
+      const text = document.getElementById('taskInput').value;
+      if (!text) return;
+      const li = document.createElement('li');
+      li.innerHTML = `<input type='checkbox'> ${text} <button onclick='this.parentElement.remove()'>🗑️</button>`;
+      document.getElementById('todoList').appendChild(li);
+      document.getElementById('taskInput').value = '';
+    }
+
+    let currentDate = new Date();
+    let selectedDate = null;
+    let events = {};
+
+    function renderCalendar() {
+      const calendar = document.getElementById('calendarTable');
+      const monthYear = document.getElementById('monthYearLabel');
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      monthYear.innerText = `${monthNames[month]} ${year}`;
+      calendar.innerHTML = '';
+      const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const headerRow = document.createElement('tr');
+      weekdays.forEach(day => {
+        const th = document.createElement('th');
+        th.textContent = day;
+        headerRow.appendChild(th);
+      });
+      calendar.appendChild(headerRow);
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      let row = document.createElement('tr');
+      for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement('td'));
+      for (let day = 1; day <= daysInMonth; day++) {
+        if (row.children.length === 7) {
+          calendar.appendChild(row);
+          row = document.createElement('tr');
+        }
+        const td = document.createElement('td');
+        td.textContent = day;
+        td.onclick = () => {
+          selectedDate = `${year}-${month + 1}-${day}`;
+          document.getElementById('eventView').innerText = events[selectedDate] || 'No events for this day.';
+        };
+        row.appendChild(td);
+      }
+      calendar.appendChild(row);
+    }
+
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
+
+    function saveEvent() {
+      const text = document.getElementById('eventInput').value;
+      if (selectedDate && text) {
+        events[selectedDate] = text;
+        document.getElementById('eventView').innerText = `${selectedDate}: ${text}`;
+        document.getElementById('eventInput').value = '';
+      }
+    }
+
+    renderCalendar();
+
+    let timer;
+    let remaining = 1500;
+    function startTimer() {
+      const mins = parseInt(document.getElementById('minutes').value);
+      remaining = mins * 60;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        let m = Math.floor(remaining / 60).toString().padStart(2, '0');
+        let s = (remaining % 60).toString().padStart(2, '0');
+        document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+        if (--remaining < 0) {
+          clearInterval(timer);
+          alert("Time's up! 🎉");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      let m = document.getElementById('minutes').value;
+      document.getElementById('timerDisplay').innerText = `${m.padStart(2, '0')}:00`;
+    }
+
+    function calculate() {
+      try {
+        const input = document.getElementById('calcInput').value;
+        const result = eval(input);
+        document.getElementById('calcResult').textContent = `Result: ${result}`;
+      } catch {
+        document.getElementById('calcResult').textContent = 'Invalid expression!';
+      }
+    }
+  </script>
+</body>
+</html>
